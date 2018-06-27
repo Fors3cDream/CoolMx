@@ -1,0 +1,1 @@
+app_default_config = "users.apps.UserConfig"
