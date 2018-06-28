@@ -4,7 +4,6 @@ from django.db import models
 
 from organization.models import CourseOrg, Teacher
 
-# Create your models here.
 #课程信息表
 class Course(models.Model):
     DEGREE_CHOICES = (

@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'organization',
     'xadmin',
     'crispy_forms',
-    'captcha'
+    'captcha',
+    'pure_pagination',
 ]
 
 MIDDLEWARE = [
@@ -82,6 +83,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # 图片文件处理器
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -142,14 +145,20 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
-# 设置我们上传文件的路径
-MEDIA_URL = '/upload_media/'
+# 设置上传文件的路径
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # 发送邮件的setting设置
-EMAIL_HOST = "smtp.sina.com"
-EMAIL_PORT = 25
-EMAIL_HOST_USER = "xinonx20@sina.cn"
-EMAIL_HOST_PASSWORD = "Qiaolj09)&31"
-EMAIL_USE_TLS= True
-EMAIL_FROM = "xinonx20@sina.cn"
+EMAIL_HOST = "smtp.exmail.qq.com"
+EMAIL_PORT = 465
+EMAIL_HOST_USER = "qiaolianjin@lmdgame.com"
+EMAIL_HOST_PASSWORD = "justFors3c"
+EMAIL_USE_SSL = True
+EMAIL_USE_TSL = False
+EMAIL_FROM = "qiaolianjin@lmdgame.com"
+
+
+"""
+https://github.com/liyaopinner/MxOnline/invitations
+"""

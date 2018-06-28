@@ -43,7 +43,7 @@ def send_register_eamil(email, send_type="register"):
 
     if send_type == "register":
         email_title = " 注册激活链接"
-        email_body = "欢迎注册小站:  请点击下面的链接激活你的账号: http://127.0.0.1:8000/active/{0}".format(code)
+        email_body = "欢迎注册:  请点击下面的链接激活你的账号: http://127.0.0.1:8081/active/{0}".format(code)
 
         # email_body = loader.render_to_string(
         #             "email_register.html",  # 需要渲染的html模板
@@ -57,31 +57,19 @@ def send_register_eamil(email, send_type="register"):
         # send_status = msg.send()
 
         #使用Django内置函数完成邮件发送。四个参数：主题，邮件内容，从哪里发，接受者list
-        send_status = send_mail(email_title, email_body, EMAIL_FROM, [email])
+        send_status = send_mail(email_title, email_body, EMAIL_FROM, [email,])
 
         # 如果发送成功
         if send_status:
-            pass
-    elif send_type == "forget":
-        email_title = "找回密码链接"
-        email_body = loader.render_to_string(
-            "email_forget.html",  # 需要渲染的html模板
-            {
-                "active_code": code  # 参数
-            }
-        )
-        msg = EmailMessage(email_title, email_body, EMAIL_FROM, [email])
-        msg.content_subtype = "html"
-        send_status = msg.send()
-    elif send_type == "update_email":
-        email_title = "修改邮箱验证码"
-        email_body = loader.render_to_string(
-            "email_update_email.html",  # 需要渲染的html模板
-            {
-                "active_code": code  # 参数
-            }
-        )
-        msg = EmailMessage(email_title, email_body, EMAIL_FROM, [email])
-        msg.content_subtype = "html"
-        send_status = msg.send()
+            return 1
 
+    elif send_type == "forget":
+        email_title = " 重置链接"
+        email_body = "请点击下面的链接重置您的密码: http://127.0.0.1:8081/reset/{0}".format(code)
+
+        # 使用Django内置函数完成邮件发送。四个参数：主题，邮件内容，从哪里发，接受者list
+        send_status = send_mail(email_title, email_body, EMAIL_FROM, [email, ])
+
+        # 如果发送成功
+        if send_status:
+            return 1

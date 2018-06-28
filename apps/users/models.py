@@ -14,7 +14,7 @@ class UserProfile(AbstractUser):
     gender = models.CharField(max_length=6, choices=GENDER_CHOICES, verbose_name="性别", default="man")
     address = models.CharField(max_length=200, verbose_name="地址", default="")
     mobile = models.CharField(max_length=11, null=True, blank=True, verbose_name="电话")
-    image = models.ImageField(upload_to="image/%Y/%m", default="image/default.png", max_length=100, verbose_name="头像")
+    image = models.ImageField(upload_to="image/%Y/%m", default="image/default.png", max_length=100, verbose_name="头像", null=True, blank=True)
 
     # meta信息 -- 用于后台显示
     class Meta:

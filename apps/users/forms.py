@@ -10,11 +10,11 @@ from users.models import UserProfile
 class LoginForm(forms.Form):
     username = forms.CharField(required=True)
     password = forms.CharField(required=True, min_length=6)
-    captcha = CaptchaField(error_messages={"invalid": "验证码错误"})
 
 
 # 验证码form
 class RegisterForm(forms.Form):
+    user_name = forms.CharField(required=True, min_length=6)
     email = forms.EmailField(required=True)
     password = forms.CharField(required=True, min_length=6)
     captcha = CaptchaField(error_messages={"invalid": "验证码错误"})
