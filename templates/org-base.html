@@ -49,7 +49,7 @@
                     <!--登录后跳转-->
 
 
-                    <a style="color:white" class="fr registerbtn" href="{% url " register" %}">注册</a>
+                    <a style="color:white" class="fr registerbtn" href="{% url 'register' %}">注册</a>
                     <a style="color:white" class="fr loginbtn" href="{% url 'login'%}?next={{ request.path }}">登录</a>
 
 
@@ -73,7 +73,7 @@
                             </p>
                         </div>
                         <div class="btn fr collectionbtn  notlogin
-                 " data-favid="22" data-fav-type="1">
+                 "data-favid="22" data-fav-type="1">
                             {% if has_fav %}
                             已收藏
                             {% else %}
@@ -135,7 +135,73 @@
 
 <script type="text/javascript" src="{% static 'js/plugins/jquery.raty.js' %}"></script>
 <script type="text/javascript">
+    //收藏分享
+//收藏分享
+function add_fav(current_elem, fav_id, fav_type){
+    $.ajax({
+        cache: false,
+        type: "POST",
+        url:"{% url "org:add-fav" %}",
+        data:{'fav_id':fav_id, 'fav_type':fav_type},
+        async: true,
+        beforeSend:function(xhr, settings){
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+        },
+        success: function(data) {
+            if(data.status == 'fail'){
+                if(data.msg == '用户未登录'){
+                    window.location.href="{% url 'login' %}?next={{ request.path }}";
+                }else{
+                    alert(data.msg)
+                }
 
+            }else if(data.status == 'success'){
+                current_elem.text(data.msg)
+            }
+        },
+    });
+}
+
+$('.collectionbtn').on('click', function(){
+    add_fav($(this),{{ course_org.id }}, 2);
+});
+
+$(function(){
+    var $precision = $('.precision'),
+        score = $precision.attr('data-star-scope'),
+        option =  {
+                    half		: true,
+                    path		: '{% static 'images/' %}',
+                    precision	: true,
+                    size		: 24,
+                    starOff		: 'g_star.png',
+                    starOn		: 'r_star.png',
+                    starHalf	: 'h_star.png',
+                    hints       : ['极差', '差', '一般', '好评', '非常满意'],
+                    noRatedMsg  : '暂时还未获得评价！',
+                    readOnly    : true,
+                    score       : score
+                };
+    $precision.raty(option);
+
+    $('.jsFavBtn').on('click', function(){
+        var type = $(this).attr('data-fav-type');
+        if(type == '1'){
+            favPraise($(this), 'fav' ,1 , '收藏');
+
+        }else if(type == '3'){
+            favPraise($(this), 'fav' ,3 );
+
+        }else if(type == '11'){
+            favPraise($(this), 'pra', 1);
+
+        }else if(type == '4'){
+            favPraise($(this), 'fav' ,4 );
+
+        }
+    });
+})
+</script>
 
 <script type="text/javascript">
 $(function() {

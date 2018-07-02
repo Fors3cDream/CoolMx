@@ -48,7 +48,7 @@
                     <!--登录后跳转-->
 
 
-                    <a style="color:white" class="fr registerbtn" href="{% url "register" %}">注册</a>
+                    <a style="color:white" class="fr registerbtn" href="{% url 'register' %}">注册</a>
                     <a style="color:white" class="fr loginbtn" href="{% url 'login'%}?next={{ request.path }}">登录</a>
 
 
@@ -83,7 +83,7 @@
 						<ul>
 							<li ><a href="{% url 'index' %}">首页</a></li>
 							<li >
-								<a href="course-list.html">
+								<a href="{% url 'course:course-list' %}">
 									公开课<img class="hot" src="{% static 'images/nav_hot.png' %}">
 								</a>
 							</li>

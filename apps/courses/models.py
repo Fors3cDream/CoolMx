@@ -8,7 +8,7 @@ from organization.models import CourseOrg, Teacher
 class Course(models.Model):
     DEGREE_CHOICES = (
         ('cj', "初级"),
-        ('zj', "终极"),
+        ('zj', "中极"),
         ('gj', "高级")
     )
 
@@ -27,10 +27,19 @@ class Course(models.Model):
     category = models.CharField(max_length=20, verbose_name="课程类别", default="后端开发")
     tag = models.CharField(max_length=15, verbose_name="课程标签", default="")
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加时间")
+    you_need_know = models.CharField(max_length=300, default=u"一颗勤学的心是本课程必要前提",verbose_name=u"课程须知")
+    teacher_tell = models.CharField(max_length=300, default=u"按时交作业,不然叫家长",verbose_name=u"老师告诉你")
 
     class Meta:
         verbose_name = "课程"
         verbose_name_plural = verbose_name
+
+    def get_chapter_nums(self):
+        return self.lesson_set.all().count()
+    get_chapter_nums.short_description = "章节数"
+
+    def get_teacher_nums(self):
+        return self.Teacher_set.all().count()
 
 
     def __str__(self):
@@ -46,6 +55,9 @@ class Lesson(models.Model):
         verbose_name = "章节"
         verbose_name_plural = verbose_name
 
+    def get_lesson_video(self):
+        return self.video_set.all()
+
     def __str__(self):
         return "《{0}》课程的章节 >> {1}".format(self.course, self.name)
 
@@ -53,6 +65,8 @@ class Lesson(models.Model):
 class Video(models.Model):
     lesson = models.ForeignKey(Lesson, verbose_name="章节")
     name = models.CharField(max_length=100, verbose_name="视频名称")
+    url = models.CharField(max_length=200, default="http://blog.mtianyan.cn/", verbose_name=u"访问地址")
+    learn_times = models.IntegerField(default=0, verbose_name="学习时长")
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加时间")
 
     class Meta:
