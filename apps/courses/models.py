@@ -38,8 +38,12 @@ class Course(models.Model):
         return self.lesson_set.all().count()
     get_chapter_nums.short_description = "章节数"
 
+    def get_chapters(self):
+        return self.lesson_set.all()
+
     def get_teacher_nums(self):
         return self.Teacher_set.all().count()
+
 
 
     def __str__(self):
@@ -55,7 +59,7 @@ class Lesson(models.Model):
         verbose_name = "章节"
         verbose_name_plural = verbose_name
 
-    def get_lesson_video(self):
+    def get_lesson_videos(self):
         return self.video_set.all()
 
     def __str__(self):
