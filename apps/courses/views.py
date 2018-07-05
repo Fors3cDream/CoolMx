@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from django.views.generic import View
+from django.db.models import Q
 
 # 分页
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
@@ -20,6 +21,14 @@ class CourseListView(View):
         #热门课程 - 根据点击数
         hot_courses = Course.objects.all().order_by("-students")[:3]
 
+        # 搜索功能
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            # 在name字段进行操作,做like语句的操作。i代表不区分大小写
+            # or操作使用Q
+            all_courses = all_courses.filter(Q(name__icontains=search_keywords) | Q(desc__icontains=search_keywords) |
+                                             Q(detail__icontains=search_keywords))
+
         # 排序
         sort = request.GET.get('sort', '')
         if sort:
@@ -35,7 +44,7 @@ class CourseListView(View):
 
         p = Paginator(all_courses, 3, request=request)
         courses = p.page(page)
-        return render(request, "course-list.html", {"all_courses": courses, "sort": sort, "hot_courses":hot_courses})
+        return render(request, "course-list.html", {"all_courses": courses, "sort": sort, "hot_courses":hot_courses, "search_keywords": search_keywords})
 
 class CourseDetailView(View):
     def get(self, request, course_id):

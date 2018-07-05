@@ -1,5 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from django.views.generic import View
+from django.db.models import Q
+
 
 # 分页
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
@@ -23,6 +25,13 @@ class OrgView(View):
 
         # 根据点击量来获取热门机构
         hot_orgs = all_orgs.order_by("-click_nums")[:3]
+
+        # 搜索功能
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            # 在name字段进行操作,做like语句的操作。i代表不区分大小写
+            # or操作使用Q
+            all_orgs = all_orgs.filter(Q(name__icontains=search_keywords) | Q(desc__icontains=search_keywords) )
 
         # 城市筛选
         city_id = request.GET.get("city", "")
@@ -54,7 +63,7 @@ class OrgView(View):
         orgs = p.page(page)
         return render(request, "org-list.html", {"all_orgs": orgs, "all_city": all_city, "org_nums":org_nums,
                                                  "city_id": city_id, "category": category, "hot_orgs":hot_orgs,
-                                                 'sort': sort})
+                                                 'sort': sort, "search_keywords": search_keywords})
 
 
 class AddUserAskView(View):
@@ -83,10 +92,10 @@ class OrgHomeView(View):
         all_teacher = course_org.teacher_set.all()[:2]
         # 向前端传值说明用户是否收藏
         has_fav = False
-        # 必须是用户已登录我们才需要判断。
-        # if request.user.is_authenticated():
-        #     if UserFavorite.objects.filter(user=request.user, fav_id=course_org.id, fav_type=2):
-        #         has_fav = True
+        #必须是用户已登录我们才需要判断。
+        if request.user.is_authenticated():
+            if UserFavorite.objects.filter(user=request.user, fav_id=course_org.id, fav_type=2):
+                has_fav = True
         return render(request, 'org-detail-homepage.html',{
            'all_courses':all_courses,
             'all_teacher':all_teacher,
@@ -203,3 +212,60 @@ class AddFavView(View):
                 return HttpResponse('{"status":"fail", "msg":"收藏出错"}', content_type='application/json')
 
 
+class TeacherListView(View):
+    def get(self, request):
+        all_teacher = Teacher.objects.all()
+        sort = request.GET.get('sort', '')
+        if sort == 'hot':
+            all_teacher = all_teacher.order_by('-click_nums')
+
+        # 搜索功能
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            # 在name字段进行操作,做like语句的操作。i代表不区分大小写
+            # or操作使用Q
+            all_teacher = all_teacher.filter(Q(name__icontains=search_keywords))
+
+        #讲师排行榜
+        rank_teacher = Teacher.objects.all().order_by("-fav_nums")[:3]
+
+        teacher_nums = all_teacher.count()
+
+        # 分页
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+
+        p = Paginator(all_teacher, 4, request=request)
+        teachers = p.page(page)
+
+        return render(request, "teachers-list.html",
+                      {"all_teacher": teachers, "sort": sort,
+                       "teacher_nums": teacher_nums, "rank_teacher": rank_teacher,
+                       "search_keywords": search_keywords})
+
+class TeacherDetailView(View):
+    def get(self, request, teacher_id):
+        teacher = Teacher.objects.get(id = int(teacher_id))
+        all_course = teacher.course_set.all()
+        teacher.click_nums += 1
+        teacher.save()
+        # 排行榜讲师
+        rank_teacher = Teacher.objects.all().order_by("-fav_nums")[:5]
+
+        has_fav_teacher = False
+        if request.user.is_authenticated():
+            if UserFavorite.objects.filter(user=request.user, fav_type=3, fav_id= teacher.id):
+                has_fav_teacher = True
+        has_fav_org = False
+        if request.user.is_authenticated():
+            if UserFavorite.objects.filter(user=request.user, fav_type=2, fav_id= teacher.org.id):
+                has_fav_org = True
+        return render(request, "teacher-detail.html", {
+            "teacher":teacher,
+            "all_course":all_course,
+            "rank_teacher":rank_teacher,
+            "has_fav_teacher":has_fav_teacher,
+            "has_fav_org":has_fav_org,
+        })
